@@ -1,54 +1,77 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.io.*;
+import java.lang.Math;
+
 
 
 
 public class Q1 {
-    private static List<Integer> departures = new ArrayList<>();
-    private static List<Integer> arrivals   = new ArrayList<>();
     
-    private static final int numberRunways;
+    
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+    public static void main(String[] args) throws NumberFormatException, IOException, InterruptedException {
+        FileReader fileReader = new FileReader("input.txt");
+        BufferedReader bufferedReader = new BufferedReader(fileReader);
+        //Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Insira a quantidade de aviões que irão decolar:");
-        int N = scanner.nextInt();
+        //System.out.println("Insira a quantidade de aviões que irão decolar:");
+        //int N = scanner.nextInt();
+        int N = Integer.parseInt(bufferedReader.readLine());
+        
+        //System.out.println("Insira os tempos de decolagem de cada avião:");
 
-        System.out.println("Insira os tempos de decolagem de cada avião:");
+		int[] departure_times = new int[N];
         for (int i = 0; i < N; i++) {
-            int departure_time = scanner.nextInt();
-            departures.add(departure_time);
+            // int departure_time = scanner.nextInt();
+            int departure_time = Integer.parseInt(bufferedReader.readLine());
+            departure_times[i] = departure_time;
         }
         
-        System.out.print("Insira a quantidade de aviões que irão pousar:");
-        int M = scanner.nextInt();
+        //System.out.println("Insira a quantidade de aviões que irão pousar:");
+        //int M = scanner.nextInt();
+        int M = Integer.parseInt(bufferedReader.readLine());
 
-        System.out.println("Insira os tempos de pouso de cada avião:");
+        //System.out.println("Insira os tempos de pouso de cada avião:");
+        int[] arrival_times = new int[M];
         for (int i = 0; i < M; i++) {
-            int arrival_time = scanner.nextInt();
-            departures.add(arrival_time);
+            //int arrival_time = scanner.nextInt();
+            int arrival_time = Integer.parseInt(bufferedReader.readLine());
+            arrival_times[i] = arrival_time;
         }
 
-        numberRunways = scanner.nextInt();
-
-        
-        for (int i = 0; i < numberRunways; i++) {
-            Runway newRunway = new Runway();
-            newRunway.start();
-        }
+        //final int numberRunways = scanner.nextInt();
+        final int numberRunways = Integer.parseInt(bufferedReader.readLine());
+        ATC controller = new ATC(numberRunways);
         
         long startTime = System.currentTimeMillis() + 25;
         Plane.setTime(startTime);
         
-        Thread.sleep(startTime - System.currentTimeMillis());
-
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        Plane[] departures = new Plane[N];
+        for (int i = 0; i < N; i++) {
+            departures[i] = new Plane(departure_times[i], true, controller);
+            departures[i].start();
         }
 
+        Plane[] arrivals = new Plane[M];
+        for (int i = 0; i < M; i++) {
+            arrivals[i] = new Plane(arrival_times[i], false, controller);
+            arrivals[i].start();
+        }
+        
+        
+        Thread.sleep(Math.max((int)(startTime - System.currentTimeMillis()), 0));
+        controller.start();
+
+        for (int i = 0; i < N; i++) {
+            departures[i].join();
+        }
+        for (int i = 0; i < M; i++) {
+            arrivals[i].join();
+        }
+        
+        System.out.print("Fim");
+
     }
+}

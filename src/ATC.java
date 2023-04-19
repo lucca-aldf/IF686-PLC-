@@ -1,19 +1,29 @@
 import java.util.List;
 
-public class ATC {
-    private List<Runway> listRunways;
+public class ATC extends Thread{
     private int totalRunway;
-    private int nextRunway = -1;
+    private int avaliableRunway;
 	
 	
-    public ATC(List<Runway> myRunways) {
-		this.totalRunway = myRunways.size();
-	    this.listRunways = myRunways;
+    public ATC(int myRunways){
+		this.totalRunway = myRunways;
+	    this.avaliableRunway = myRunways;
     }
- 
-	public Runway runwayRequest(Plane myPlane) {
-		nextRunway = (nextRunway + 1) % totalRunway;
-		return listRunways.get(nextRunway);
-	}
-	 
+    
+    public synchronized void requestRunway() throws InterruptedException {
+        while (this.avaliableRunway == 0) {
+            wait();
+        }
+        this.avaliableRunway--;
+        notifyAll();
+    }
+
+    public synchronized void freeRunway() throws InterruptedException {
+        while (this.totalRunway == this.avaliableRunway) {
+            wait();
+        }
+        this.avaliableRunway++;
+        notifyAll();
+    }
+
 }

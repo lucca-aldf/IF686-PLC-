@@ -1,27 +1,53 @@
-public class Plane {
+public class Plane extends Thread{
 	private static long START_TIME;
-	
+
+	private ATC controlTower;
 	private boolean willTakeoff;
-	private int id;
-	private int nextId = 0;
+	private long id;
+	private int scheduledTime;
+	private static long nextId = 0;
 	
-	public Plane(boolean direction) {
+	public Plane(int time, boolean direction, ATC myController) {
+		this.controlTower = myController;
 		this.willTakeoff = direction;
+		this.scheduledTime = time;
 		this.id = nextId;
 		nextId ++;
+		
 	}
 	
 	public boolean getWillTakeoff() {
 		return willTakeoff;
 	}
 	
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 	
 	
-	public void go() {
-		System.out.println("Avião Pista nº " + getId() + " inicializada");
+	public void run(){
+		try {
+			
+		Thread.sleep(scheduledTime + (START_TIME - System.currentTimeMillis()));
+			controlTower.requestRunway();
+		
+		if (willTakeoff) {
+			System.out.print("Avião de ID " + id + " decolou em " + (System.currentTimeMillis() - START_TIME) + "ms ao invés de " + scheduledTime + "ms,");
+		}
+		else {
+			System.out.print("Avião de ID " + id + " pousou em " + (System.currentTimeMillis() - START_TIME) + "ms ao invés de " + scheduledTime + "ms,");
+		}
+		
+		System.out.println("com atraso de " + (System.currentTimeMillis() - START_TIME - scheduledTime) + "ms");
+		Thread.sleep(500);
+		
+		controlTower.freeRunway();;
+		
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public static void setTime(long time) {
