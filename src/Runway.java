@@ -1,6 +1,8 @@
+import java.util.concurrent.locks.ReentrantLock;
+
 public class Runway extends Thread{
 	private boolean active;
-	private boolean occupied;
+	private Lock occupied = new ReentrantLock();
     private Plane occupant;
     private int id;
     private int nextId = 0;
@@ -26,6 +28,7 @@ public class Runway extends Thread{
 	            	Thread.sleep(500); // Tempo de decolagem / pouso
 	            	this.occupant.go();
 	            	this.occupied = false;
+	            	syncronized ()
 	            }
 	            Thread.sleep(2000); // Sleep for 2 seconds (2000 milliseconds)
 	            System.out.println("Thread woke up after 2 seconds.");
@@ -49,5 +52,9 @@ public class Runway extends Thread{
     public void performOperation() {
         // ... your logic here ...
         System.out.println("Performing operation on number: " + number);
+    }
+    
+    public void setTime(int time) {
+    	START_TIME = time;
     }
 }

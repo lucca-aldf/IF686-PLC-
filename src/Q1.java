@@ -33,11 +33,16 @@ public class Q1 {
 
         numberRunways = scanner.nextInt();
 
-
+        
         for (int i = 0; i < numberRunways; i++) {
             Runway newRunway = new Runway();
             newRunway.start();
         }
+        
+        long startTime = System.currentTimeMillis() + 25;
+        Plane.setTime(startTime);
+        
+        Thread.sleep(startTime - System.currentTimeMillis());
 
 
         try {
